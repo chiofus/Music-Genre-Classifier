@@ -248,6 +248,8 @@ def save_features(loader: DataLoader, net: nn.Module, use_gpu: bool = True) -> L
     Takes the given network structure and processes the given loader on it.
 
     Returns two tensors: one for the resulting features, and one for the true labels for the given features, in that order.
+
+    This function will try to extract features directly from the model. If this fails, it will directly evaluate the model.
     """
 
     total_data: List[Tuple[Tensor, Tensor]] = list() #Defininig initial list to save all our results to
@@ -262,7 +264,10 @@ def save_features(loader: DataLoader, net: nn.Module, use_gpu: bool = True) -> L
             labels: Tensor = labels.cuda()
 
         with torch.no_grad(): #stop keeping track of grads, no need to update model
-            features: Tensor = net.features(images)
+            try:
+                features: Tensor = net.features(images)
+            except:
+                features: Tensor = net(images)
 
         curr_data: Tuple = tuple([torch.from_numpy(features.detach().cpu().numpy()), labels]) #Creating current data tuple
         #Forces features tensor as a numpy array, then reads it back as a tensor
@@ -384,7 +389,7 @@ class genre_classifier(nn.Module):
     """
     This is a generalized classifier. Please provide output_size that matches the dimensions of your encoder's output.
     """
-    def __init__(self, output_size: int, dropout_prob: float = 0.3):
+    def __init__(self, output_size: int, dropout_prob: float = 0.3, first_fc_dim: int = 4096, second_fc_dim: int = 512):
         super(genre_classifier, self).__init__()
         self.name = "genre_classifier"
         self.dropout_prob = dropout_prob
@@ -392,9 +397,9 @@ class genre_classifier(nn.Module):
         self.output_size = output_size
 
         #FC layers
-        self.fc1 = nn.Linear(self.output_size, 4096)
-        self.fc2 = nn.Linear(4096, 512)
-        self.softmax = nn.Linear(512, 10) #this layer simply transforms the last fully connected output tensor to have size ten (number of classes we have) for its last dimension
+        self.fc1 = nn.Linear(self.output_size, first_fc_dim)
+        self.fc2 = nn.Linear(first_fc_dim, second_fc_dim)
+        self.softmax = nn.Linear(second_fc_dim, 10) #this layer simply transforms the last fully connected output tensor to have size ten (number of classes we have) for its last dimension
 
     def forward(self, x: Tensor):
         #Fully connected
