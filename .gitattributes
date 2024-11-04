@@ -1,0 +1,2 @@
+ffmpeg/** filter=lfs diff=lfs merge=lfs -text
+Dataset/downloads/** filter=lfs diff=lfs merge=lfs -text
