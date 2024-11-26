@@ -1,2 +1,5 @@
 training_data/
 __pycache__/
+Dataset/downloads/
+Dataset/split_wavs_from_downloads/
+Datasets/youtube_spectrograms/

@@ -420,6 +420,23 @@ def plot_confusion_matrix(model: nn.Module, test_loader, class_names: List[str],
     plt.title("Confusion Matrix", fontsize=fontsize + 4)
     plt.show()
 
+def scale_arr(arr: np.ndarray, min: float = 0.0, max: float = 1.0) -> np.ndarray:
+    """
+    Scales all values in given arr in the range of min and max values provided.
+
+    Used to shape spectrograms
+    """
+    arr_min: float = arr.min()
+    arr_max: float = arr.max()
+
+    #Standardizing arr with min max normalization (all values will now be in the range 0 - 1)
+    x_std: np.ndarray = (arr - arr_min) / (arr_max - arr_min)
+
+    #Scaling with given max, min
+    x_scaled: np.ndarray = x_std * (max - min) + min
+
+    return x_scaled
+
 class genre_classifier(nn.Module):
     """
     This is a generalized classifier. Please provide output_size that matches the dimensions of your encoder's output.
