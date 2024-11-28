@@ -26,6 +26,7 @@ import shutil
 from tools import genre_classifier
 from torchvision import models
 from typing import Dict
+import sys
 
 #Pytorch, plotting
 import torch
@@ -418,7 +419,13 @@ def infer_vgg16_yt(link: List[str], dimensions: Tuple[float, float] = (2.88, 2.8
     return infer_genre_given_link(best_classifier, vgg_16, link, dimensions = dimensions, complete = complete)
 
 if __name__ == "__main__":
-    link = ["https://www.youtube.com/watch?v=dQw4w9WgXcQ"]
+
+    link = ["https://www.youtube.com/watch?v=dQw4w9WgXcQ"] #provide link manually here
+
+    try:
+        link = [sys.argv[1]] #if link given in args, will override link above
+    except:
+        print("No link provided in args")
 
     prediction = infer_vgg16_yt(link)
 
