@@ -267,6 +267,7 @@ def save_features(loader: DataLoader, net: nn.Module, use_gpu: bool = True) -> L
         with torch.no_grad(): #stop keeping track of grads, no need to update model
             try:
                 features: Tensor = net.features(images)
+                print("Features extracted successfuly")
             except:
                 features: Tensor = net(images)
 
