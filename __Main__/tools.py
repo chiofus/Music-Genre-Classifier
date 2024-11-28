@@ -18,7 +18,7 @@ import numpy as np
 import random, time
 from pathlib import Path
 import os, math
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, precision_recall_fscore_support
 
 #Useful functions
 def augment_training(data_folder: ImageFolder, split: int, noise_seed: int = 547, noise_multiplier: float = 0.6) -> ImageFolder:
@@ -420,6 +420,40 @@ def plot_confusion_matrix(model: nn.Module, test_loader, class_names: List[str],
 
     plt.title("Confusion Matrix", fontsize=fontsize + 4)
     plt.show()
+
+def get_precision_recall_fscores(model: nn.Module, test_loader, class_names: List[str], fontsize=8):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
+    model.eval()  # Set the model to evaluation mode
+
+    all_labels = []
+    all_predictions = []
+
+    with torch.no_grad():
+        for images, labels in test_loader:
+            images, labels = images.to(device), labels.to(device)
+
+            outputs = model(images)
+            _, predicted = torch.max(outputs, 1)
+
+            all_labels.extend(labels.cpu().numpy())
+            all_predictions.extend(predicted.cpu().numpy())
+
+    # Calculate confusion matrix
+    total_scores = precision_recall_fscore_support(all_labels, all_predictions, average=None)
+
+    return total_scores
+
+    # # Plot confusion matrix with smaller font size for labels
+    # disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=class_names)
+    # fig, ax = plt.subplots(figsize=(8, 8))
+    # disp.plot(cmap=plt.cm.Blues, ax=ax, xticks_rotation="vertical")
+
+    # # Set font sizes for tick labels
+    # ax.tick_params(axis='both', labelsize=fontsize)
+
+    # plt.title("Confusion Matrix", fontsize=fontsize + 4)
+    # plt.show()
 
 def scale_arr(arr: np.ndarray, min: float = 0.0, max: float = 1.0) -> np.ndarray:
     """

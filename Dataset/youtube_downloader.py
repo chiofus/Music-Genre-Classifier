@@ -415,12 +415,16 @@ def infer_vgg16_yt(link: List[str], dimensions: Tuple[float, float] = (2.88, 2.8
     state = torch.load(model_path)
     best_classifier.load_state_dict(state)
 
+    #setting to evaluation mode
+    # vgg_16.eval()
+    # best_classifier.eval()
+
     #making inference
     return infer_genre_given_link(best_classifier, vgg_16, link, dimensions = dimensions, complete = complete)
 
 if __name__ == "__main__":
 
-    link = ["https://www.youtube.com/watch?v=dQw4w9WgXcQ"] #provide link manually here
+    link = ["https://www.youtube.com/watch?v=i2FW1WJc0lg"] #provide link manually here
 
     try:
         link = [sys.argv[1]] #if link given in args, will override link above
